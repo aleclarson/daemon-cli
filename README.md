@@ -1,12 +1,12 @@
 # daemon-cli
 
-A macOS-exclusive CLI tool to turn arbitrary shell commands into background services managed by `launchd`. It provides automatic log rotation and compatibility with `brew services`.
+A macOS-exclusive CLI tool to turn arbitrary shell commands into background services managed by `launchd`. It provides automatic log rotation and standard `launchd` integration.
 
 ## Features
 
 - **Arbitrary Commands:** Supports flags, pipes, and loops by encapsulating them in a managed wrapper script.
 - **Log Rotation:** Integrated `logrotate` support with configurable intervals and retention.
-- **Homebrew Compatible:** Uses naming conventions that allow services to be visible in `brew services list`.
+- **Native Launchd:** Uses standard `com.daemon-cli` naming conventions for native `launchd` integration.
 - **Persistence:** Configurations and wrappers are stored in standard user directories (`~/.config`, `~/.local`).
 
 ## Prerequisites
@@ -96,7 +96,7 @@ daemon rm <name>
 | :---------------- | :------------------------------------ |
 | **Wrappers**      | `~/.local/share/daemon-cli/wrappers/` |
 | **Configs**       | `~/.config/daemon-cli/logrotate.d/`   |
-| **Logs**          | `~/Library/Logs/Homebrew/`            |
+| **Logs**          | `~/Library/Logs/daemon-cli/`          |
 | **Launch Agents** | `~/Library/LaunchAgents/`             |
 
 ## License

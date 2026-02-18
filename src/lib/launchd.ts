@@ -14,7 +14,7 @@ export async function generatePlist(name: string, options: LaunchdOptions) {
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>homebrew.mxcl.${name}</string>
+    <string>com.daemon-cli.${name}</string>
     <key>ProgramArguments</key>
     <array>
         <string>${wrapperPath}</string>

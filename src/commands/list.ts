@@ -23,7 +23,7 @@ export async function listCommand() {
   const servicesData = []
 
   for (const name of managedNames) {
-    const label = `homebrew.mxcl.${name}`
+    const label = `com.daemon-cli.${name}`
     const match = launchctlList.split('\n').find(line => line.includes(label))
 
     let status = 'Stopped'
