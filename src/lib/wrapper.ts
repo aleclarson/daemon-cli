@@ -3,7 +3,8 @@ import { getWrapperPath } from './paths.js'
 
 export async function generateWrapper(name: string, command: string) {
   const userShell = process.env.SHELL || '/bin/zsh'
-  const currentPath = process.env.PATH || '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
+  const currentPath =
+    process.env.PATH || '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
 
   const wrapperContent = `#!${userShell}
 # ------------------------------------------------------------------------------

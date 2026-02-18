@@ -8,13 +8,14 @@ export async function validateCommand(command: string): Promise<boolean> {
   let finished = false
 
   return new Promise(resolve => {
-    const timer = setTimeout(async () => {
+    const timer = setTimeout(() => {
       if (finished) return
       finished = true
       subprocess.kill('SIGKILL')
+      subprocess.unref()
       spinner.stop('Command started successfully.')
       resolve(true)
-    }, 2000)
+    }, 500)
 
     subprocess.on('exit', code => {
       if (finished) return
