@@ -12,7 +12,8 @@ export async function validateCommand(command: string): Promise<boolean> {
       if (finished) return
       finished = true
       subprocess.kill('SIGKILL')
-      subprocess.unref()
+      // Ensure the subprocess is reaped so the CLI can exit
+      subprocess.catch(() => {}).finally(() => subprocess.unref())
       spinner.stop('Command started successfully.')
       resolve(true)
     }, 500)

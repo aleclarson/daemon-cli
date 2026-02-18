@@ -74,6 +74,7 @@ const create = command({
       compress: args.compress,
       keepAlive: !args.noKeepAlive,
     })
+    process.exit(0)
   },
 })
 
