@@ -36,36 +36,61 @@ A macOS-exclusive CLI tool to turn arbitrary shell commands into background serv
 ## Usage
 
 ### Create a Daemon
+
 Turn any command into a background service. If arguments are omitted, the tool will prompt you interactively.
+
 ```bash
 daemon create <name> [command] [flags]
 ```
+
 **Flags:**
+
 - `--rotation <daily|weekly|hourly>`: Set log rotation interval (default: daily).
 - `--keep <count>`: Number of rotated logs to keep (default: 7).
 - `--compress`: Compress rotated logs (default: true).
 - `--no-keep-alive`: Disable automatic restart if the process crashes.
 
+### Restart a Daemon
+
+Restart a running service.
+
+```bash
+daemon restart <name>
+```
+
+### Autocompletion
+
+To enable zsh completion, add the following to your `.zshrc`:
+
+```bash
+source <(daemon completion zsh)
+```
+
 ### List Daemons
+
 Show all daemons managed by `daemon-cli`, including their status, PID, and log size.
+
 ```bash
 daemon list
 ```
 
 ### Remove a Daemon
+
 Stop the service and delete associated configurations and wrappers.
+
 ```bash
 daemon rm <name>
 ```
 
 ## Storage Locations
 
-| Resource | Path |
-| :--- | :--- |
-| **Wrappers** | `~/.local/share/daemon-cli/wrappers/` |
-| **Configs** | `~/.config/daemon-cli/logrotate.d/` |
-| **Logs** | `~/Library/Logs/Homebrew/` |
-| **Launch Agents**| `~/Library/LaunchAgents/` |
+| Resource          | Path                                  |
+| :---------------- | :------------------------------------ |
+| **Wrappers**      | `~/.local/share/daemon-cli/wrappers/` |
+| **Configs**       | `~/.config/daemon-cli/logrotate.d/`   |
+| **Logs**          | `~/Library/Logs/Homebrew/`            |
+| **Launch Agents** | `~/Library/LaunchAgents/`             |
 
 ## License
+
 MIT

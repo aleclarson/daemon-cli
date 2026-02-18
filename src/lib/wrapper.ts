@@ -1,5 +1,5 @@
-import fs from 'fs-extra';
-import { getWrapperPath } from './paths.js';
+import fs from 'fs-extra'
+import { getWrapperPath } from './paths.js'
 
 export async function generateWrapper(name: string, command: string) {
   const wrapperContent = `#!/bin/bash
@@ -9,10 +9,10 @@ export async function generateWrapper(name: string, command: string) {
 
 # Execute the command
 exec ${command}
-`;
+`
 
-  const wrapperPath = getWrapperPath(name);
-  await fs.outputFile(wrapperPath, wrapperContent);
-  await fs.chmod(wrapperPath, '755');
-  return wrapperPath;
+  const wrapperPath = getWrapperPath(name)
+  await fs.outputFile(wrapperPath, wrapperContent)
+  await fs.chmod(wrapperPath, '755')
+  return wrapperPath
 }
