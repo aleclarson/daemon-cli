@@ -58,6 +58,14 @@ Restart a running service.
 daemon restart <name>
 ```
 
+### Read Logs
+
+Read or tail the logs of a service.
+
+```bash
+daemon logs <name> [-f] [-n <lines>]
+```
+
 ### Autocompletion
 
 To enable zsh completion, add the following to your `.zshrc`:

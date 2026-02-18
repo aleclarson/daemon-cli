@@ -15,6 +15,7 @@ import { createCommand } from './commands/create.js'
 import { listCommand } from './commands/list.js'
 import { removeCommand } from './commands/remove.js'
 import { restartCommand } from './commands/restart.js'
+import { logsCommand } from './commands/logs.js'
 import {
   getManagedDaemonNames,
   getZshCompletionScript,
@@ -107,6 +108,31 @@ const restart = command({
   },
 })
 
+const logs = command({
+  name: 'logs',
+  description: 'Read or tail the logs of a managed daemon',
+  args: {
+    name: positional({ type: string, displayName: 'name' }),
+    tail: flag({
+      type: boolean,
+      long: 'tail',
+      short: 'f',
+      defaultValue: () => false,
+      description: 'Continuously output the log',
+    }),
+    lines: option({
+      type: number,
+      long: 'lines',
+      short: 'n',
+      defaultValue: () => 100,
+      description: 'Number of lines to output',
+    }),
+  },
+  handler: async args => {
+    await logsCommand(args)
+  },
+})
+
 const completion = subcommands({
   name: 'completion',
   description: 'Shell completion scripts',
@@ -133,7 +159,7 @@ const completion = subcommands({
 
 const app = subcommands({
   name: 'daemon',
-  cmds: { create, list, rm, restart, completion },
+  cmds: { create, list, rm, restart, logs, completion },
 })
 
 run(app, process.argv.slice(2)).catch(err => {

@@ -20,6 +20,7 @@ _daemon() {
     'list:List all managed daemons'
     'rm:Remove a managed daemon'
     'restart:Restart a managed daemon'
+    'logs:Read or tail the logs of a managed daemon'
     'completion:Generate shell completion scripts'
   )
 
@@ -37,6 +38,15 @@ _daemon() {
           local -a daemons
           daemons=($(daemon completion list-daemons))
           _values 'daemons' $daemons
+          ;;
+        logs)
+          local -a daemons
+          daemons=($(daemon completion list-daemons))
+          _arguments \\
+            '--tail[Continuously output the log]' \\
+            '(-f)--tail[Continuously output the log]' \\
+            '(-n)--lines[Number of lines to output]' \\
+            "1: :($daemons)"
           ;;
         create)
           _arguments \\
