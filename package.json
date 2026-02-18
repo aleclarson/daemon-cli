@@ -26,5 +26,8 @@
     "build": "tsc",
     "start": "tsx src/cli.ts",
     "format": "prettier --write ."
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
