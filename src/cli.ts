@@ -13,6 +13,7 @@ import {
 } from 'cmd-ts'
 import { createCommand } from './commands/create.js'
 import { listCommand } from './commands/list.js'
+import { stopCommand } from './commands/stop.js'
 import { removeCommand } from './commands/remove.js'
 import { restartCommand } from './commands/restart.js'
 import { logsCommand } from './commands/logs.js'
@@ -98,6 +99,17 @@ const rm = command({
   },
 })
 
+const stop = command({
+  name: 'stop',
+  description: 'Stop a managed daemon',
+  args: {
+    name: positional({ type: string, displayName: 'name' }),
+  },
+  handler: async ({ name }) => {
+    await stopCommand(name)
+  },
+})
+
 const restart = command({
   name: 'restart',
   description: 'Restart a managed daemon',
@@ -160,7 +172,7 @@ const completion = subcommands({
 
 const app = subcommands({
   name: 'daemon',
-  cmds: { create, list, rm, restart, logs, completion },
+  cmds: { create, list, rm, stop, restart, logs, completion },
 })
 
 run(app, process.argv.slice(2)).catch(err => {

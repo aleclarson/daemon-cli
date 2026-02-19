@@ -19,6 +19,7 @@ _daemon() {
     'create:Create and start a new daemon'
     'list:List all managed daemons'
     'rm:Remove a managed daemon'
+    'stop:Stop a managed daemon'
     'restart:Restart a managed daemon'
     'logs:Read or tail the logs of a managed daemon'
     'completion:Generate shell completion scripts'
@@ -34,7 +35,7 @@ _daemon() {
       ;;
     args)
       case $line[1] in
-        rm|restart)
+        rm|restart|stop)
           local -a daemons
           daemons=($(daemon completion list-daemons))
           _values 'daemons' $daemons
