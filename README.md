@@ -75,6 +75,7 @@ daemon create <name> [command] [flags]
 ```
 
 **Flags:**
+
 - `--rotation <daily|weekly|hourly>`: Set log rotation interval.
 - `--keep <count>`: Number of rotated logs to keep.
 - `--compress`: Compress rotated logs.
@@ -113,6 +114,7 @@ daemon logs <name> [flags]
 ```
 
 **Flags:**
+
 - `-f, --tail`: Continuously output the log.
 - `-n, --lines <count>`: Number of lines to output (default: 100).
 
