@@ -74,3 +74,13 @@ export async function cleanupCron() {
     // Ignore errors
   }
 }
+
+export async function forceLogRotation(name: string) {
+  const configPath = getConfigPath(name)
+  if (!(await fs.pathExists(configPath))) {
+    return
+  }
+
+  const logrotatePath = (await which('logrotate')) || '/usr/local/bin/logrotate'
+  await execa(logrotatePath, ['-f', '-s', STATE_FILE, configPath])
+}

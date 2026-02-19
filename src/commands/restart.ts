@@ -1,6 +1,7 @@
 import fs from 'fs-extra'
 import { stopService, startService } from '../lib/launchd.js'
 import { getPlistPath } from '../lib/paths.js'
+import { forceLogRotation } from '../lib/logrotate.js'
 import { log, spinner } from '../utils/ui.js'
 
 export async function restartCommand(name: string) {
@@ -14,6 +15,14 @@ export async function restartCommand(name: string) {
 
   // Try to stop first
   await stopService(name)
+
+  // Force log rotation
+  try {
+    spinner.message(`Rotating logs for '${name}'...`)
+    await forceLogRotation(name)
+  } catch (error: any) {
+    log.warn(`Failed to rotate logs: ${error.message}`)
+  }
 
   // Then start again
   try {
