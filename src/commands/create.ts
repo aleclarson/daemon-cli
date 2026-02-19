@@ -1,7 +1,8 @@
 import fs from 'fs-extra'
+import { execa } from 'execa'
 import { log, prompt, select, spinner } from '../utils/ui.js'
 import { validateCommand } from '../utils/process.js'
-import { ALL_DIRS, getPlistPath } from '../lib/paths.js'
+import { ALL_DIRS, getPlistPath, GOVERNOR_PATH } from '../lib/paths.js'
 import { generateWrapper } from '../lib/wrapper.js'
 import { generatePlist, startService } from '../lib/launchd.js'
 import { generateLogrotateConfig, setupCron } from '../lib/logrotate.js'
@@ -53,6 +54,15 @@ export async function createCommand(options: CreateOptions) {
 
   spinner.start('Generating files...')
   const wrapperPath = await generateWrapper(name, command)
+
+  log.info(`Registering daemon with sudo for security (hashing)...`)
+  try {
+    await execa('sudo', [GOVERNOR_PATH, 'register', name, wrapperPath])
+  } catch (err: any) {
+    log.error(`Registration failed: ${err.message}`)
+    process.exit(1)
+  }
+
   const finalPlistPath = await generatePlist(name, {
     keepAlive: options.keepAlive,
   })

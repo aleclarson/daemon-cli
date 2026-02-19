@@ -1,5 +1,10 @@
 import fs from 'fs-extra'
-import { getPlistPath, getWrapperPath, getLogPath } from './paths.js'
+import {
+  getPlistPath,
+  getWrapperPath,
+  getLogPath,
+  GOVERNOR_PATH,
+} from './paths.js'
 import { execa } from 'execa'
 
 export interface LaunchdOptions {
@@ -7,7 +12,6 @@ export interface LaunchdOptions {
 }
 
 export async function generatePlist(name: string, options: LaunchdOptions) {
-  const wrapperPath = getWrapperPath(name)
   const logPath = getLogPath(name)
   const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -17,7 +21,9 @@ export async function generatePlist(name: string, options: LaunchdOptions) {
     <string>com.daemon-cli.${name}</string>
     <key>ProgramArguments</key>
     <array>
-        <string>${wrapperPath}</string>
+        <string>${GOVERNOR_PATH}</string>
+        <string>run</string>
+        <string>${name}</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

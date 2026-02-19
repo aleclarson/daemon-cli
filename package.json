@@ -23,7 +23,8 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run build-governor",
+    "build-governor": "cd governor && cargo build --release",
     "start": "tsx src/cli.ts",
     "format": "prettier --write ."
   },
