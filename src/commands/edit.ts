@@ -4,12 +4,14 @@ import { restartCommand } from './restart.js'
 import fs from 'fs-extra'
 import { log } from '../utils/ui.js'
 import { execa } from 'execa'
+import crypto from 'crypto'
 
 export interface EditDeps {
   checkExists: (path: string) => Promise<boolean>
   spawnEditor: (path: string) => Promise<void>
   updateHash: (name: string, path: string) => Promise<void>
   restartDaemon: (name: string) => Promise<void>
+  calculateHash: (path: string) => Promise<string>
 }
 
 export const defaultDeps: EditDeps = {
@@ -39,6 +41,10 @@ export const defaultDeps: EditDeps = {
   restartDaemon: async name => {
     await restartCommand(name)
   },
+  calculateHash: async path => {
+    const content = await fs.readFile(path)
+    return crypto.createHash('sha256').update(content).digest('hex')
+  },
 }
 
 export async function editCommand(name: string, deps: EditDeps = defaultDeps) {
@@ -49,11 +55,32 @@ export async function editCommand(name: string, deps: EditDeps = defaultDeps) {
     process.exit(1)
   }
 
+  let initialHash: string
+  try {
+    initialHash = await deps.calculateHash(wrapperPath)
+  } catch (err: any) {
+    log.error(`Failed to read daemon wrapper: ${err.message}`)
+    process.exit(1)
+  }
+
   try {
     await deps.spawnEditor(wrapperPath)
   } catch (err: any) {
     log.error(`Failed to edit: ${err.message}`)
     process.exit(1)
+  }
+
+  let finalHash: string
+  try {
+    finalHash = await deps.calculateHash(wrapperPath)
+  } catch (err: any) {
+    log.error(`Failed to read daemon wrapper after edit: ${err.message}`)
+    process.exit(1)
+  }
+
+  if (initialHash === finalHash) {
+    log.info('No changes detected. Exiting.')
+    return
   }
 
   // Log info instead of spinner because sudo might prompt for password
