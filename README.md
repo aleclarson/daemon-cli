@@ -105,6 +105,14 @@ Restart a managed service.
 daemon restart <name>
 ```
 
+### Edit a Daemon
+
+Open the wrapper script in your preferred editor (`$EDITOR` or `$VISUAL`). Once you save and exit, the daemon will be automatically re-registered and restarted.
+
+```bash
+daemon edit <name>
+```
+
 ### Read Logs
 
 Read or tail the logs of a service.

@@ -16,6 +16,7 @@ import { listCommand } from './commands/list.js'
 import { stopCommand } from './commands/stop.js'
 import { removeCommand } from './commands/remove.js'
 import { restartCommand } from './commands/restart.js'
+import { editCommand } from './commands/edit.js'
 import { logsCommand } from './commands/logs.js'
 import {
   getManagedDaemonNames,
@@ -121,6 +122,17 @@ const restart = command({
   },
 })
 
+const edit = command({
+  name: 'edit',
+  description: 'Edit the wrapper script of a managed daemon',
+  args: {
+    name: positional({ type: string, displayName: 'name' }),
+  },
+  handler: async ({ name }) => {
+    await editCommand(name)
+  },
+})
+
 const logs = command({
   name: 'logs',
   description: 'Read or tail the logs of a managed daemon',
@@ -172,7 +184,7 @@ const completion = subcommands({
 
 const app = subcommands({
   name: 'daemon',
-  cmds: { create, list, rm, stop, restart, logs, completion },
+  cmds: { create, list, rm, stop, restart, edit, logs, completion },
 })
 
 run(app, process.argv.slice(2)).catch(err => {
