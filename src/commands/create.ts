@@ -54,15 +54,19 @@ export async function createCommand(options: CreateOptions) {
 
   spinner.start('Generating files...')
   const wrapperPath = await generateWrapper(name, command)
+  spinner.stop('Wrapper generated.')
 
   log.info(`Registering daemon with sudo for security (hashing)...`)
   try {
-    await execa('sudo', [GOVERNOR_PATH, 'register', name, wrapperPath])
+    await execa('sudo', [GOVERNOR_PATH, 'register', name, wrapperPath], {
+      stdio: 'inherit',
+    })
   } catch (err: any) {
     log.error(`Registration failed: ${err.message}`)
     process.exit(1)
   }
 
+  spinner.start('Generating remaining files...')
   const finalPlistPath = await generatePlist(name, {
     keepAlive: options.keepAlive,
   })

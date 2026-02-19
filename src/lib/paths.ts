@@ -1,5 +1,6 @@
 import os from 'os'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import untildify from 'untildify'
 
 const home = os.homedir()
@@ -14,8 +15,8 @@ export const STATE_FILE = untildify(
 )
 
 export const GOVERNOR_PATH = path.join(
-  path.dirname(new URL(import.meta.url).pathname),
-  '../../../governor/target/release/daemon-governor'
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../governor/target/release/daemon-governor'
 )
 
 export const getWrapperPath = (name: string) =>
