@@ -80,6 +80,58 @@ daemon create <name> [command] [flags]
 - `--compress`: Compress rotated logs.
 - `--no-keep-alive`: Disable automatic restart if the process crashes.
 
+### List Daemons
+
+Show all daemons managed by `daemon-cli`, including their status, PID, and log size.
+
+```bash
+daemon list
+```
+
+### Stop a Daemon
+
+Stop a running service without removing it.
+
+```bash
+daemon stop <name>
+```
+
+### Restart a Daemon
+
+Restart a managed service.
+
+```bash
+daemon restart <name>
+```
+
+### Read Logs
+
+Read or tail the logs of a service.
+
+```bash
+daemon logs <name> [flags]
+```
+
+**Flags:**
+- `-f, --tail`: Continuously output the log.
+- `-n, --lines <count>`: Number of lines to output (default: 100).
+
+### Remove a Daemon
+
+Stop the service and delete all associated configurations, wrappers, and logs.
+
+```bash
+daemon rm <name>
+```
+
+### Shell Completion
+
+To enable zsh completion, add the following to your `.zshrc`:
+
+```bash
+source <(daemon completion zsh)
+```
+
 ### Security Model
 
 - **The Allowlist:** A root-owned JSON file located at `/Library/Application Support/daemon-cli/allowlist.json`. This ensures that only an Administrator can authorize a script.
