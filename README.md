@@ -75,6 +75,7 @@ daemon create <name> [command] [flags]
 ```
 
 **Flags:**
+
 - `--rotation <daily|weekly|hourly>`: Set log rotation interval.
 - `--keep <count>`: Number of rotated logs to keep.
 - `--compress`: Compress rotated logs.
@@ -104,6 +105,14 @@ Restart a managed service.
 daemon restart <name>
 ```
 
+### Edit a Daemon
+
+Open the wrapper script in your preferred editor (`$EDITOR` or `$VISUAL`). Once you save and exit, the daemon will be automatically re-registered and restarted.
+
+```bash
+daemon edit <name>
+```
+
 ### Read Logs
 
 Read or tail the logs of a service.
@@ -113,6 +122,7 @@ daemon logs <name> [flags]
 ```
 
 **Flags:**
+
 - `-f, --tail`: Continuously output the log.
 - `-n, --lines <count>`: Number of lines to output (default: 100).
 
