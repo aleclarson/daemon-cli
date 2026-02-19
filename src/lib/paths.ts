@@ -16,7 +16,7 @@ export const STATE_FILE = untildify(
 
 export const GOVERNOR_PATH = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../../governor/target/release/daemon-governor'
+  '../../governor/bin/daemon-governor'
 )
 
 export const getWrapperPath = (name: string) =>

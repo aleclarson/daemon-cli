@@ -24,11 +24,15 @@
   },
   "scripts": {
     "build": "tsc && npm run build-governor",
-    "build-governor": "cd governor && cargo build --release",
+    "build-governor": "npm run build-governor-arm && npm run build-governor-x64 && npm run build-governor-lipo",
+    "build-governor-arm": "cd governor && cargo build --release --target aarch64-apple-darwin",
+    "build-governor-x64": "cd governor && cargo build --release --target x86_64-apple-darwin",
+    "build-governor-lipo": "mkdir -p governor/bin && lipo -create governor/target/aarch64-apple-darwin/release/daemon-governor governor/target/x86_64-apple-darwin/release/daemon-governor -output governor/bin/daemon-governor",
     "start": "tsx src/cli.ts",
     "format": "prettier --write ."
   },
   "files": [
-    "dist"
+    "dist",
+    "governor/bin"
   ]
 }

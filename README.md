@@ -26,9 +26,20 @@ Granting permission for a shell script is difficult because giving access to `/b
   ```bash
   brew install logrotate
   ```
-- **Rust:** Required to build the Governor binary.
 
-## Installation (From Source)
+## Installation
+
+### From NPM (Recommended)
+
+Install the CLI globally via your favorite package manager:
+
+```bash
+pnpm add -g daemon-cli
+# or
+npm install -g daemon-cli
+```
+
+### From Source
 
 1.  Clone the repository.
 2.  Install dependencies and build:
@@ -48,8 +59,9 @@ To allow your background daemons to access restricted folders without permission
 1.  Open **System Settings**.
 2.  Go to **Privacy & Security** -> **Full Disk Access**.
 3.  Click the **+** (plus) button.
-4.  Navigate to the project directory and select:
-    `governor/target/release/daemon-governor`
+4.  Navigate to the location of `daemon-governor`.
+    - If installed via `npm -g`, it's usually at: `/usr/local/lib/node_modules/daemon-cli/governor/bin/daemon-governor`
+    - If installed via `pnpm -g`, use `pnpm root -g` to find the location.
 5.  Ensure the toggle is **ON**.
 
 ## Usage
