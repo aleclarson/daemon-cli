@@ -46,12 +46,17 @@ export async function startService(name: string) {
   const plistPath = getPlistPath(name)
 
   if (await fs.pathExists(plistPath)) {
-    let content = await fs.readFile(plistPath, 'utf8')
-    content = content.replace(
-      /<key>RunAtLoad<\/key>[\s\n]*<false\/>/g,
-      '<key>RunAtLoad</key>\n    <true/>'
-    )
-    await fs.writeFile(plistPath, content, 'utf8')
+    try {
+      await execa('plutil', [
+        '-replace',
+        'RunAtLoad',
+        '-bool',
+        'true',
+        plistPath,
+      ])
+    } catch (err: any) {
+      // Fallback or ignore if plutil fails
+    }
   }
 
   const uid = process.getuid?.() || 0
@@ -62,12 +67,17 @@ export async function stopService(name: string) {
   const plistPath = getPlistPath(name)
 
   if (await fs.pathExists(plistPath)) {
-    let content = await fs.readFile(plistPath, 'utf8')
-    content = content.replace(
-      /<key>RunAtLoad<\/key>[\s\n]*<true\/>/g,
-      '<key>RunAtLoad</key>\n    <false/>'
-    )
-    await fs.writeFile(plistPath, content, 'utf8')
+    try {
+      await execa('plutil', [
+        '-replace',
+        'RunAtLoad',
+        '-bool',
+        'false',
+        plistPath,
+      ])
+    } catch (err: any) {
+      // Fallback or ignore if plutil fails
+    }
   }
 
   const uid = process.getuid?.() || 0
