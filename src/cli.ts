@@ -66,6 +66,11 @@ const create = command({
       defaultValue: () => false,
       description: 'Disable KeepAlive',
     }),
+    throttleInterval: option({
+      type: optional(number),
+      long: 'throttle-interval',
+      description: 'ThrottleInterval for the daemon in seconds (default: 10)',
+    }),
   },
   handler: async args => {
     await createCommand({
@@ -75,6 +80,7 @@ const create = command({
       keep: args.keep,
       compress: args.compress,
       keepAlive: !args.noKeepAlive,
+      throttleInterval: args.throttleInterval,
     })
     process.exit(0)
   },
@@ -116,9 +122,14 @@ const restart = command({
   description: 'Restart a managed daemon',
   args: {
     name: positional({ type: string, displayName: 'name' }),
+    throttleInterval: option({
+      type: optional(number),
+      long: 'throttle-interval',
+      description: 'Update ThrottleInterval for the daemon in seconds',
+    }),
   },
-  handler: async ({ name }) => {
-    await restartCommand(name)
+  handler: async ({ name, throttleInterval }) => {
+    await restartCommand(name, { throttleInterval })
   },
 })
 

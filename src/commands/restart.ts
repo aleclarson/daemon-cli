@@ -1,10 +1,14 @@
 import fs from 'fs-extra'
+import { execa } from 'execa'
 import { stopService, startService } from '../lib/launchd.js'
 import { getPlistPath } from '../lib/paths.js'
 import { forceLogRotation } from '../lib/logrotate.js'
 import { log, spinner } from '../utils/ui.js'
 
-export async function restartCommand(name: string) {
+export async function restartCommand(
+  name: string,
+  options?: { throttleInterval?: number }
+) {
   const plistPath = getPlistPath(name)
   if (!(await fs.pathExists(plistPath))) {
     log.error(`Daemon '${name}' does not exist.`)
@@ -15,6 +19,28 @@ export async function restartCommand(name: string) {
 
   // Try to stop first
   await stopService(name)
+
+  // Update plist if throttleInterval is provided
+  if (options?.throttleInterval !== undefined) {
+    try {
+      const plistContent = await fs.readFile(plistPath, 'utf8')
+      if (/<key>KeepAlive<\/key>\s*<true\/>/.test(plistContent)) {
+        await execa('plutil', [
+          '-replace',
+          'ThrottleInterval',
+          '-integer',
+          String(options.throttleInterval),
+          plistPath,
+        ])
+      } else {
+        log.warn(
+          'ThrottleInterval only applies when KeepAlive is enabled. Ignoring.'
+        )
+      }
+    } catch (error: any) {
+      log.warn(`Failed to update ThrottleInterval: ${error.message}`)
+    }
+  }
 
   // Force log rotation
   try {
