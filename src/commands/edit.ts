@@ -1,10 +1,11 @@
 import { spawn } from 'child_process'
-import { getWrapperPath, GOVERNOR_PATH } from '../lib/paths.js'
+import { getWrapperPath } from '../lib/paths.js'
 import { restartCommand } from './restart.js'
 import fs from 'fs-extra'
 import { log } from '../utils/ui.js'
 import { execa } from 'execa'
 import crypto from 'crypto'
+import { registerScriptWithGovernor } from '../utils/process.js'
 
 export interface EditDeps {
   checkExists: (path: string) => Promise<boolean>
@@ -33,10 +34,7 @@ export const defaultDeps: EditDeps = {
       })
     }),
   updateHash: async (name, path) => {
-    // sudo might prompt for password, so we inherit stdio
-    await execa('sudo', [GOVERNOR_PATH, 'register', name, path], {
-      stdio: 'inherit',
-    })
+    await registerScriptWithGovernor(name, path)
   },
   restartDaemon: async name => {
     await restartCommand(name)

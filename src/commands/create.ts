@@ -1,8 +1,11 @@
 import fs from 'fs-extra'
 import { execa } from 'execa'
 import { log, prompt, select, spinner } from '../utils/ui.js'
-import { validateCommand } from '../utils/process.js'
-import { ALL_DIRS, getPlistPath, GOVERNOR_PATH } from '../lib/paths.js'
+import {
+  validateCommand,
+  registerScriptWithGovernor,
+} from '../utils/process.js'
+import { ALL_DIRS, getPlistPath, SYSTEM_GOVERNOR_PATH } from '../lib/paths.js'
 import { generateWrapper } from '../lib/wrapper.js'
 import { generatePlist, startService } from '../lib/launchd.js'
 import { generateLogrotateConfig, setupCron } from '../lib/logrotate.js'
@@ -57,11 +60,11 @@ export async function createCommand(options: CreateOptions) {
   const wrapperPath = await generateWrapper(name, command)
   spinner.stop('Wrapper generated.')
 
-  log.info(`Registering daemon with sudo for security (hashing)...`)
+  log.info(
+    `Copying governor binary to ${SYSTEM_GOVERNOR_PATH} and registering daemon...`
+  )
   try {
-    await execa('sudo', [GOVERNOR_PATH, 'register', name, wrapperPath], {
-      stdio: 'inherit',
-    })
+    await registerScriptWithGovernor(name, wrapperPath)
   } catch (err: any) {
     log.error(`Registration failed: ${err.message}`)
     process.exit(1)

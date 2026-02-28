@@ -1,5 +1,6 @@
 import { execa } from 'execa'
 import { spinner, log } from './ui.js'
+import { BUNDLED_GOVERNOR_PATH, SYSTEM_GOVERNOR_PATH } from '../lib/paths.js'
 
 export async function validateCommand(command: string): Promise<boolean> {
   spinner.start('Validating command...')
@@ -58,4 +59,18 @@ export async function which(binary: string): Promise<string | null> {
   } catch {
     return null
   }
+}
+
+export async function registerScriptWithGovernor(
+  name: string,
+  wrapperPath: string
+) {
+  // Ensure the destination directory exists and copy the binary
+  await execa('sudo', ['mkdir', '-p', '/usr/local/bin'])
+  await execa('sudo', ['cp', BUNDLED_GOVERNOR_PATH, SYSTEM_GOVERNOR_PATH])
+
+  // Register the daemon
+  await execa('sudo', [SYSTEM_GOVERNOR_PATH, 'register', name, wrapperPath], {
+    stdio: 'inherit',
+  })
 }
