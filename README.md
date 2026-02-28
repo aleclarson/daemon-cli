@@ -60,8 +60,7 @@ To allow your background daemons to access restricted folders without permission
 2.  Go to **Privacy & Security** -> **Full Disk Access**.
 3.  Click the **+** (plus) button.
 4.  Navigate to the location of `daemon-governor`.
-    - If installed via `npm -g`, it's usually at: `/usr/local/lib/node_modules/daemon-cli/governor/bin/daemon-governor`
-    - If installed via `pnpm -g`, use `pnpm root -g` to find the location.
+    - The CLI automatically copies the binary to: `/usr/local/bin/daemon-governor`
 5.  Ensure the toggle is **ON**.
 
 ## Usage
@@ -80,6 +79,7 @@ daemon create <name> [command] [flags]
 - `--keep <count>`: Number of rotated logs to keep.
 - `--compress`: Compress rotated logs.
 - `--no-keep-alive`: Disable automatic restart if the process crashes.
+- `--throttle-interval <seconds>`: Minimum time between restarts if the process crashes (default: 10).
 
 ### List Daemons
 
@@ -99,10 +99,10 @@ daemon stop <name>
 
 ### Restart a Daemon
 
-Restart a managed service.
+Restart a managed service. You can also update the throttle interval.
 
 ```bash
-daemon restart <name>
+daemon restart <name> [--throttle-interval <seconds>]
 ```
 
 ### Edit a Daemon
@@ -147,6 +147,7 @@ source <(daemon completion zsh)
 - **The Allowlist:** A root-owned JSON file located at `/Library/Application Support/daemon-cli/allowlist.json`. This ensures that only an Administrator can authorize a script.
 - **Registration:** When you run `daemon create`, the tool calculates the SHA-256 hash of the generated wrapper script and stores it in the allowlist via `sudo daemon-governor register`.
 - **The Execution:** When `launchd` triggers, it calls `daemon-governor run <name>`. The Governor re-calculates the script's hash; if it doesn't match the one in the allowlist (due to unauthorized tampering), it refuses to execute.
+- **Anti-Looping:** If a hash mismatch is detected, the Governor automatically updates the service's `KeepAlive` setting to `false` and unloads it to prevent `launchd` from repeatedly trying to start the broken script.
 
 ## License
 
