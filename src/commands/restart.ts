@@ -4,7 +4,10 @@ import { getPlistPath } from '../lib/paths.js'
 import { forceLogRotation } from '../lib/logrotate.js'
 import { log, spinner } from '../utils/ui.js'
 
-export async function restartCommand(name: string) {
+export async function restartCommand(
+  name: string,
+  options?: { throttleInterval?: number }
+) {
   const plistPath = getPlistPath(name)
   if (!(await fs.pathExists(plistPath))) {
     log.error(`Daemon '${name}' does not exist.`)
@@ -15,6 +18,31 @@ export async function restartCommand(name: string) {
 
   // Try to stop first
   await stopService(name)
+
+  // Update plist if throttleInterval is provided
+  if (options?.throttleInterval !== undefined) {
+    try {
+      let plistContent = await fs.readFile(plistPath, 'utf8')
+      const throttleIntervalRegex =
+        /(<key>ThrottleInterval<\/key>\s*)<integer>\d+<\/integer>/
+
+      if (throttleIntervalRegex.test(plistContent)) {
+        plistContent = plistContent.replace(
+          throttleIntervalRegex,
+          `$1<integer>${options.throttleInterval}</integer>`
+        )
+      } else {
+        // Fallback: inject before <key>StandardOutPath</key>
+        plistContent = plistContent.replace(
+          /(<key>StandardOutPath<\/key>)/,
+          `<key>ThrottleInterval</key>\n    <integer>${options.throttleInterval}</integer>\n    $1`
+        )
+      }
+      await fs.writeFile(plistPath, plistContent, 'utf8')
+    } catch (error: any) {
+      log.warn(`Failed to update ThrottleInterval: ${error.message}`)
+    }
+  }
 
   // Force log rotation
   try {

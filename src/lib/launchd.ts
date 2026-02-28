@@ -9,10 +9,12 @@ import { execa } from 'execa'
 
 export interface LaunchdOptions {
   keepAlive: boolean
+  throttleInterval?: number
 }
 
 export async function generatePlist(name: string, options: LaunchdOptions) {
   const logPath = getLogPath(name)
+  const throttleInterval = options.throttleInterval ?? 10
   const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -29,6 +31,8 @@ export async function generatePlist(name: string, options: LaunchdOptions) {
     <true/>
     <key>KeepAlive</key>
     <${options.keepAlive ? 'true' : 'false'}/>
+    <key>ThrottleInterval</key>
+    <integer>${throttleInterval}</integer>
     <key>StandardOutPath</key>
     <string>${logPath}</string>
     <key>StandardErrorPath</key>

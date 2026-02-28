@@ -14,6 +14,7 @@ export interface CreateOptions {
   keep?: number
   compress: boolean
   keepAlive: boolean
+  throttleInterval?: number
 }
 
 export async function createCommand(options: CreateOptions) {
@@ -69,6 +70,7 @@ export async function createCommand(options: CreateOptions) {
   spinner.start('Generating remaining files...')
   const finalPlistPath = await generatePlist(name, {
     keepAlive: options.keepAlive,
+    throttleInterval: options.throttleInterval,
   })
   const configPath = await generateLogrotateConfig(name, {
     rotation: rotation as 'daily' | 'weekly' | 'hourly',
