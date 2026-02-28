@@ -3,7 +3,7 @@ import {
   getPlistPath,
   getWrapperPath,
   getLogPath,
-  GOVERNOR_PATH,
+  SYSTEM_GOVERNOR_PATH,
 } from './paths.js'
 import { execa } from 'execa'
 
@@ -21,7 +21,7 @@ export async function generatePlist(name: string, options: LaunchdOptions) {
     <string>com.daemon-cli.${name}</string>
     <key>ProgramArguments</key>
     <array>
-        <string>${GOVERNOR_PATH}</string>
+        <string>${SYSTEM_GOVERNOR_PATH}</string>
         <string>run</string>
         <string>${name}</string>
     </array>

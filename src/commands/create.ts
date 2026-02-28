@@ -2,7 +2,12 @@ import fs from 'fs-extra'
 import { execa } from 'execa'
 import { log, prompt, select, spinner } from '../utils/ui.js'
 import { validateCommand } from '../utils/process.js'
-import { ALL_DIRS, getPlistPath, GOVERNOR_PATH } from '../lib/paths.js'
+import {
+  ALL_DIRS,
+  getPlistPath,
+  BUNDLED_GOVERNOR_PATH,
+  SYSTEM_GOVERNOR_PATH,
+} from '../lib/paths.js'
 import { generateWrapper } from '../lib/wrapper.js'
 import { generatePlist, startService } from '../lib/launchd.js'
 import { generateLogrotateConfig, setupCron } from '../lib/logrotate.js'
@@ -56,9 +61,16 @@ export async function createCommand(options: CreateOptions) {
   const wrapperPath = await generateWrapper(name, command)
   spinner.stop('Wrapper generated.')
 
-  log.info(`Registering daemon with sudo for security (hashing)...`)
+  log.info(
+    `Copying governor binary to ${SYSTEM_GOVERNOR_PATH} and registering daemon...`
+  )
   try {
-    await execa('sudo', [GOVERNOR_PATH, 'register', name, wrapperPath], {
+    // Ensure the destination directory exists and copy the binary
+    await execa('sudo', ['mkdir', '-p', '/usr/local/bin'])
+    await execa('sudo', ['cp', BUNDLED_GOVERNOR_PATH, SYSTEM_GOVERNOR_PATH])
+
+    // Register the daemon
+    await execa('sudo', [SYSTEM_GOVERNOR_PATH, 'register', name, wrapperPath], {
       stdio: 'inherit',
     })
   } catch (err: any) {

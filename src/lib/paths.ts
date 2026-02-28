@@ -14,10 +14,12 @@ export const STATE_FILE = untildify(
   '~/.local/state/daemon-cli/logrotate.status'
 )
 
-export const GOVERNOR_PATH = path.join(
+export const BUNDLED_GOVERNOR_PATH = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '../../governor/bin/daemon-governor'
 )
+
+export const SYSTEM_GOVERNOR_PATH = '/usr/local/bin/daemon-governor'
 
 export const getWrapperPath = (name: string) =>
   path.join(WRAPPERS_DIR, `${name}.sh`)
