@@ -103,6 +103,29 @@ fn handle_run(name: String) -> Result<()> {
     // Verify hash
     let current_hash = calculate_hash(&job.path)?;
     if current_hash != job.hash {
+        // If hash changes, disable KeepAlive to prevent launchd from infinitely restarting the broken script.
+        if let Some(mut plist_path) = dirs::home_dir() {
+            plist_path.push("Library");
+            plist_path.push("LaunchAgents");
+            plist_path.push(format!("com.daemon-cli.{}.plist", name));
+
+            if plist_path.exists() {
+                if let Some(path_str) = plist_path.to_str() {
+                    // Update the plist on disk
+                    let _ = Command::new("plutil")
+                        .args(["-replace", "KeepAlive", "-bool", "NO", path_str])
+                        .output();
+
+                    // Tell launchd to unload the job to immediately stop it
+                    let uid = unsafe { libc::getuid() };
+                    let gui_domain = format!("gui/{}", uid);
+                    let _ = Command::new("launchctl")
+                        .args(["bootout", &gui_domain, path_str])
+                        .output();
+                }
+            }
+        }
+
         return Err(anyhow::anyhow!("Security Alert: Script '{}' has been modified since registration!", name));
     }
 
