@@ -1,14 +1,11 @@
 import { spawn } from 'child_process'
-import {
-  getWrapperPath,
-  BUNDLED_GOVERNOR_PATH,
-  SYSTEM_GOVERNOR_PATH,
-} from '../lib/paths.js'
+import { getWrapperPath } from '../lib/paths.js'
 import { restartCommand } from './restart.js'
 import fs from 'fs-extra'
 import { log } from '../utils/ui.js'
 import { execa } from 'execa'
 import crypto from 'crypto'
+import { registerGovernor } from '../utils/process.js'
 
 export interface EditDeps {
   checkExists: (path: string) => Promise<boolean>
@@ -37,14 +34,7 @@ export const defaultDeps: EditDeps = {
       })
     }),
   updateHash: async (name, path) => {
-    // Ensure the binary is present at the system path and up-to-date
-    await execa('sudo', ['mkdir', '-p', '/usr/local/bin'])
-    await execa('sudo', ['cp', BUNDLED_GOVERNOR_PATH, SYSTEM_GOVERNOR_PATH])
-
-    // sudo might prompt for password, so we inherit stdio
-    await execa('sudo', [SYSTEM_GOVERNOR_PATH, 'register', name, path], {
-      stdio: 'inherit',
-    })
+    await registerGovernor(name, path)
   },
   restartDaemon: async name => {
     await restartCommand(name)

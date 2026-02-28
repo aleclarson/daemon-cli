@@ -1,13 +1,8 @@
 import fs from 'fs-extra'
 import { execa } from 'execa'
 import { log, prompt, select, spinner } from '../utils/ui.js'
-import { validateCommand } from '../utils/process.js'
-import {
-  ALL_DIRS,
-  getPlistPath,
-  BUNDLED_GOVERNOR_PATH,
-  SYSTEM_GOVERNOR_PATH,
-} from '../lib/paths.js'
+import { validateCommand, registerGovernor } from '../utils/process.js'
+import { ALL_DIRS, getPlistPath, SYSTEM_GOVERNOR_PATH } from '../lib/paths.js'
 import { generateWrapper } from '../lib/wrapper.js'
 import { generatePlist, startService } from '../lib/launchd.js'
 import { generateLogrotateConfig, setupCron } from '../lib/logrotate.js'
@@ -65,14 +60,7 @@ export async function createCommand(options: CreateOptions) {
     `Copying governor binary to ${SYSTEM_GOVERNOR_PATH} and registering daemon...`
   )
   try {
-    // Ensure the destination directory exists and copy the binary
-    await execa('sudo', ['mkdir', '-p', '/usr/local/bin'])
-    await execa('sudo', ['cp', BUNDLED_GOVERNOR_PATH, SYSTEM_GOVERNOR_PATH])
-
-    // Register the daemon
-    await execa('sudo', [SYSTEM_GOVERNOR_PATH, 'register', name, wrapperPath], {
-      stdio: 'inherit',
-    })
+    await registerGovernor(name, wrapperPath)
   } catch (err: any) {
     log.error(`Registration failed: ${err.message}`)
     process.exit(1)
