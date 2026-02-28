@@ -61,7 +61,10 @@ export async function which(binary: string): Promise<string | null> {
   }
 }
 
-export async function registerGovernor(name: string, wrapperPath: string) {
+export async function registerScriptWithGovernor(
+  name: string,
+  wrapperPath: string
+) {
   // Ensure the destination directory exists and copy the binary
   await execa('sudo', ['mkdir', '-p', '/usr/local/bin'])
   await execa('sudo', ['cp', BUNDLED_GOVERNOR_PATH, SYSTEM_GOVERNOR_PATH])

@@ -5,7 +5,7 @@ import fs from 'fs-extra'
 import { log } from '../utils/ui.js'
 import { execa } from 'execa'
 import crypto from 'crypto'
-import { registerGovernor } from '../utils/process.js'
+import { registerScriptWithGovernor } from '../utils/process.js'
 
 export interface EditDeps {
   checkExists: (path: string) => Promise<boolean>
@@ -34,7 +34,7 @@ export const defaultDeps: EditDeps = {
       })
     }),
   updateHash: async (name, path) => {
-    await registerGovernor(name, path)
+    await registerScriptWithGovernor(name, path)
   },
   restartDaemon: async name => {
     await restartCommand(name)

@@ -1,7 +1,10 @@
 import fs from 'fs-extra'
 import { execa } from 'execa'
 import { log, prompt, select, spinner } from '../utils/ui.js'
-import { validateCommand, registerGovernor } from '../utils/process.js'
+import {
+  validateCommand,
+  registerScriptWithGovernor,
+} from '../utils/process.js'
 import { ALL_DIRS, getPlistPath, SYSTEM_GOVERNOR_PATH } from '../lib/paths.js'
 import { generateWrapper } from '../lib/wrapper.js'
 import { generatePlist, startService } from '../lib/launchd.js'
@@ -60,7 +63,7 @@ export async function createCommand(options: CreateOptions) {
     `Copying governor binary to ${SYSTEM_GOVERNOR_PATH} and registering daemon...`
   )
   try {
-    await registerGovernor(name, wrapperPath)
+    await registerScriptWithGovernor(name, wrapperPath)
   } catch (err: any) {
     log.error(`Registration failed: ${err.message}`)
     process.exit(1)
