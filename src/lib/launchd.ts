@@ -45,18 +45,14 @@ export async function generatePlist(name: string, options: LaunchdOptions) {
 export async function startService(name: string) {
   const plistPath = getPlistPath(name)
 
-  if (await fs.pathExists(plistPath)) {
-    try {
-      await execa('plutil', [
-        '-replace',
-        'RunAtLoad',
-        '-bool',
-        'true',
-        plistPath,
-      ])
-    } catch (err: any) {
-      // Fallback or ignore if plutil fails
-    }
+  if (!(await fs.pathExists(plistPath))) {
+    throw new Error(`Daemon '${name}' does not exist (missing plist).`)
+  }
+
+  try {
+    await execa('plutil', ['-replace', 'RunAtLoad', '-bool', 'true', plistPath])
+  } catch (err: any) {
+    // Fallback or ignore if plutil fails
   }
 
   const uid = process.getuid?.() || 0
@@ -66,18 +62,20 @@ export async function startService(name: string) {
 export async function stopService(name: string) {
   const plistPath = getPlistPath(name)
 
-  if (await fs.pathExists(plistPath)) {
-    try {
-      await execa('plutil', [
-        '-replace',
-        'RunAtLoad',
-        '-bool',
-        'false',
-        plistPath,
-      ])
-    } catch (err: any) {
-      // Fallback or ignore if plutil fails
-    }
+  if (!(await fs.pathExists(plistPath))) {
+    throw new Error(`Daemon '${name}' does not exist (missing plist).`)
+  }
+
+  try {
+    await execa('plutil', [
+      '-replace',
+      'RunAtLoad',
+      '-bool',
+      'false',
+      plistPath,
+    ])
+  } catch (err: any) {
+    // Fallback or ignore if plutil fails
   }
 
   const uid = process.getuid?.() || 0
