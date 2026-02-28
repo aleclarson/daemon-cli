@@ -1,4 +1,5 @@
 import fs from 'fs-extra'
+import { execa } from 'execa'
 import { stopService, startService } from '../lib/launchd.js'
 import { getPlistPath } from '../lib/paths.js'
 import { forceLogRotation } from '../lib/logrotate.js'
@@ -22,23 +23,20 @@ export async function restartCommand(
   // Update plist if throttleInterval is provided
   if (options?.throttleInterval !== undefined) {
     try {
-      let plistContent = await fs.readFile(plistPath, 'utf8')
-      const throttleIntervalRegex =
-        /(<key>ThrottleInterval<\/key>\s*)<integer>\d+<\/integer>/
-
-      if (throttleIntervalRegex.test(plistContent)) {
-        plistContent = plistContent.replace(
-          throttleIntervalRegex,
-          `$1<integer>${options.throttleInterval}</integer>`
-        )
+      const plistContent = await fs.readFile(plistPath, 'utf8')
+      if (/<key>KeepAlive<\/key>\s*<true\/>/.test(plistContent)) {
+        await execa('plutil', [
+          '-replace',
+          'ThrottleInterval',
+          '-integer',
+          String(options.throttleInterval),
+          plistPath,
+        ])
       } else {
-        // Fallback: inject before <key>StandardOutPath</key>
-        plistContent = plistContent.replace(
-          /(<key>StandardOutPath<\/key>)/,
-          `<key>ThrottleInterval</key>\n    <integer>${options.throttleInterval}</integer>\n    $1`
+        log.warn(
+          'ThrottleInterval only applies when KeepAlive is enabled. Ignoring.'
         )
       }
-      await fs.writeFile(plistPath, plistContent, 'utf8')
     } catch (error: any) {
       log.warn(`Failed to update ThrottleInterval: ${error.message}`)
     }
