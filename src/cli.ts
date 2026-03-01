@@ -18,6 +18,7 @@ import { removeCommand } from './commands/remove.js'
 import { restartCommand } from './commands/restart.js'
 import { editCommand } from './commands/edit.js'
 import { logsCommand } from './commands/logs.js'
+import { tuiCommand } from './commands/tui.js'
 import {
   getManagedDaemonNames,
   getZshCompletionScript,
@@ -208,9 +209,18 @@ const completion = subcommands({
   },
 })
 
+const tui = command({
+  name: 'tui',
+  description: 'Interactive TUI mode',
+  args: {},
+  handler: async () => {
+    await tuiCommand()
+  },
+})
+
 const app = subcommands({
   name: 'daemon',
-  cmds: { create, list, rm, stop, restart, edit, logs, completion },
+  cmds: { tui, create, list, rm, stop, restart, edit, logs, completion },
 })
 
 run(app, process.argv.slice(2)).catch(err => {
