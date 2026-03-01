@@ -55,9 +55,14 @@ export async function listCommand() {
     if (await fs.pathExists(wrapperPath)) {
       const content = await fs.readFile(wrapperPath, 'utf-8')
       const lines = content.split('\n')
-      const execLine = lines.find(l => l.startsWith('exec '))
-      if (execLine) {
-        command = execLine.replace('exec ', '')
+
+      // Find the last non-empty line that isn't a comment or the PATH export
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const line = lines[i]!.trim()
+        if (line && !line.startsWith('#') && !line.startsWith('export PATH=')) {
+          command = line
+          break
+        }
       }
     }
 
