@@ -71,6 +71,13 @@ const create = command({
       long: 'throttle-interval',
       description: 'ThrottleInterval for the daemon in seconds (default: 10)',
     }),
+    follow: flag({
+      type: boolean,
+      long: 'follow',
+      short: 'f',
+      defaultValue: () => false,
+      description: 'Continuously output the log after creating',
+    }),
   },
   handler: async args => {
     await createCommand({
@@ -81,6 +88,7 @@ const create = command({
       compress: args.compress,
       keepAlive: !args.noKeepAlive,
       throttleInterval: args.throttleInterval,
+      follow: args.follow,
     })
     process.exit(0)
   },
@@ -127,9 +135,16 @@ const restart = command({
       long: 'throttle-interval',
       description: 'Update ThrottleInterval for the daemon in seconds',
     }),
+    follow: flag({
+      type: boolean,
+      long: 'follow',
+      short: 'f',
+      defaultValue: () => false,
+      description: 'Continuously output the log after restarting',
+    }),
   },
-  handler: async ({ name, throttleInterval }) => {
-    await restartCommand(name, { throttleInterval })
+  handler: async ({ name, throttleInterval, follow }) => {
+    await restartCommand(name, { throttleInterval, follow })
   },
 })
 
