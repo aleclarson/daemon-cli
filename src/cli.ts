@@ -18,7 +18,7 @@ import { removeCommand } from './commands/remove.js'
 import { restartCommand } from './commands/restart.js'
 import { editCommand } from './commands/edit.js'
 import { logsCommand } from './commands/logs.js'
-import { tuiCommand } from './commands/tui.jsx'
+import { tuiCommand } from './commands/tui.js'
 import {
   getManagedDaemonNames,
   getZshCompletionScript,
