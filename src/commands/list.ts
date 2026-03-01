@@ -20,7 +20,16 @@ export async function listCommand() {
   }
 
   const { stdout: launchctlList } = await execa('launchctl', ['list'])
-  const servicesData = []
+
+  interface ServiceInfo {
+    Name: string
+    Status: string
+    PID: string
+    'Log Size': string
+    Command: string
+  }
+
+  const servicesData: ServiceInfo[] = []
 
   for (const name of managedNames) {
     const label = `com.daemon-cli.${name}`
