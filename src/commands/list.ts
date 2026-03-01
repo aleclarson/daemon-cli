@@ -61,7 +61,31 @@ export async function listCommand() {
     })
   }
 
-  console.table(servicesData)
+  const columns = [
+    { key: 'Name', label: 'Name' },
+    { key: 'Status', label: 'Status' },
+    { key: 'PID', label: 'PID' },
+    { key: 'Log Size', label: 'Log Size' },
+    { key: 'Command', label: 'Command' },
+  ] as const
+
+  const widths = columns.map(col => {
+    return Math.max(
+      col.label.length,
+      ...servicesData.map(row => String(row[col.key]).length)
+    )
+  })
+
+  const header = columns.map((col, i) => col.label.padEnd(widths[i])).join('  ')
+  console.log(header)
+  console.log('-'.repeat(header.length))
+
+  for (const row of servicesData) {
+    const line = columns
+      .map((col, i) => String(row[col.key]).padEnd(widths[i]))
+      .join('  ')
+    console.log(line)
+  }
 }
 
 function formatBytes(bytes: number, decimals = 2) {
