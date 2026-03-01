@@ -5,10 +5,16 @@ import {
   validateCommand,
   registerScriptWithGovernor,
 } from '../utils/process.js'
-import { ALL_DIRS, getPlistPath, SYSTEM_GOVERNOR_PATH } from '../lib/paths.js'
+import {
+  ALL_DIRS,
+  getPlistPath,
+  getLogPath,
+  SYSTEM_GOVERNOR_PATH,
+} from '../lib/paths.js'
 import { generateWrapper } from '../lib/wrapper.js'
 import { generatePlist, startService } from '../lib/launchd.js'
 import { generateLogrotateConfig, setupCron } from '../lib/logrotate.js'
+import { logsCommand } from './logs.js'
 
 export interface CreateOptions {
   name?: string
@@ -18,6 +24,7 @@ export interface CreateOptions {
   compress: boolean
   keepAlive: boolean
   throttleInterval?: number
+  follow?: boolean
 }
 
 export async function createCommand(options: CreateOptions) {
@@ -89,7 +96,15 @@ export async function createCommand(options: CreateOptions) {
   spinner.start('Starting service via launchctl...')
   await startService(name)
   await setupCron()
+
+  // Ensure the log file exists so `tail` doesn't error out immediately
+  await fs.ensureFile(getLogPath(name))
+
   spinner.stop(`Service '${name}' started.`)
 
   log.success(`Daemon '${name}' is running.`)
+
+  if (options.follow) {
+    await logsCommand({ name, tail: true, lines: 100 })
+  }
 }

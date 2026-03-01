@@ -1,13 +1,14 @@
 import fs from 'fs-extra'
 import { execa } from 'execa'
 import { stopService, startService } from '../lib/launchd.js'
-import { getPlistPath } from '../lib/paths.js'
+import { getPlistPath, getLogPath } from '../lib/paths.js'
 import { forceLogRotation } from '../lib/logrotate.js'
 import { log, spinner } from '../utils/ui.js'
+import { logsCommand } from './logs.js'
 
 export async function restartCommand(
   name: string,
-  options?: { throttleInterval?: number }
+  options?: { throttleInterval?: number; follow?: boolean }
 ) {
   const plistPath = getPlistPath(name)
   if (!(await fs.pathExists(plistPath))) {
@@ -53,8 +54,13 @@ export async function restartCommand(
   // Then start again
   try {
     await startService(name)
+    await fs.ensureFile(getLogPath(name))
     spinner.stop(`Service '${name}' restarted.`)
     log.success(`Daemon '${name}' has been restarted.`)
+
+    if (options?.follow) {
+      await logsCommand({ name, tail: true, lines: 100 })
+    }
   } catch (error: any) {
     spinner.stop(`Failed to start service '${name}'.`)
     log.error(`Error: ${error.message}`)
